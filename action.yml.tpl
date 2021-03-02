@@ -17,7 +17,7 @@ runs:
         DOCKERFILE_CONTENTS="%%BASE64_DOCKERFILE_CONTENTS%%"
         echo ${DOCKERFILE_CONTENTS} | base64 -d > ./Dockerfile
 
-        docker build -f /github/actions/action-package-site/Dockerfile \
+        docker build \
           --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
