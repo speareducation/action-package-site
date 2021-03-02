@@ -10,11 +10,14 @@ inputs:
     required: true
     description: "Amazon AWS Secret Access Key"
   node-auth-token:
-    require: true
+    required: true
     description: "Authorization key for Node repository"
   github-ref:
-    require: true
+    required: true
     description: "Github ref to use in tagging resulting image"
+  github-repository:
+    required: true
+    description: "Repository to act on"
 runs:
   using: "composite"
   steps:
@@ -25,7 +28,7 @@ runs:
         set -a
         . .buildconfig
         set +a
-        TARGET_IMAGE_VERSION=$(echo "${{ inputs.github-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        TARGET_IMAGE_VERSION=$(echo "${INPUT_GITHUB_REF}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         pwd
         DOCKERFILE_CONTENTS="%%BASE64_DOCKERFILE_CONTENTS%%"
         echo ${DOCKERFILE_CONTENTS} | base64 -d > ./Dockerfile
@@ -34,12 +37,11 @@ runs:
           --build-arg AWS_ACCESS_KEY_ID="${INPUT_AWS_ACCESS_KEY_ID}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${INPUT_AWS_SECRET_ACCESS_KEY}" \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
-          --build-arg GIT_REPOSITORY="${{ env.GITHUB_REPOSITORY }}" \
+          --build-arg GIT_REPOSITORY="${{INPUT_GITHUB_REPOSITORY }}" \
           --build-arg ARTIFACT="${ARTIFACT}" \
           --build-arg DOCKER_REGISTRY="${DOCKER_REGISTRY}" \
           --build-arg DOCKER_BASE_IMAGE="${DOCKER_REGISTRY}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
           --build-arg NODE_AUTH_TOKEN="${INPUT_NODE_AUTH_TOKEN}" \
-          --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
           -t "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}" .
     - name: Test Release Artifact
       shell: bash
