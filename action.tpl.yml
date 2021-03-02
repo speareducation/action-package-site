@@ -37,7 +37,7 @@ runs:
           --build-arg AWS_ACCESS_KEY_ID="${INPUT_AWS_ACCESS_KEY_ID}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${INPUT_AWS_SECRET_ACCESS_KEY}" \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
-          --build-arg GIT_REPOSITORY="${{INPUT_GITHUB_REPOSITORY }}" \
+          --build-arg GIT_REPOSITORY="${INPUT_GITHUB_REPOSITORY}" \
           --build-arg ARTIFACT="${ARTIFACT}" \
           --build-arg DOCKER_REGISTRY="${DOCKER_REGISTRY}" \
           --build-arg DOCKER_BASE_IMAGE="${DOCKER_REGISTRY}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
