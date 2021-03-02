@@ -3,7 +3,7 @@ name: "Package Spear Site"
 author: "Kenzi Stewart <kstewart@speareducation.com>"
 description: "Packages a site into a deployable docker image"
 runs:
-  using: 'docker'
+  using: "composite"
   steps:
     - name: Package site
       shell: bash
