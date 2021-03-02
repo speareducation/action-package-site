@@ -6,6 +6,7 @@ runs:
   using: 'composite'
   steps:
     - name: Package site
+      shell: bash
       run: |
         set -ex
         set -a
@@ -24,6 +25,7 @@ runs:
           --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
           -t "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}" .
     - name: Test Release Artifact
+      shell: bash
       run: |
         DOCKER_IMAGE_TAG="${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}"
         TEST_CONFIG_FILE=./test.config.yml
@@ -47,5 +49,6 @@ runs:
           GOSS_FILE="build/test-goss.${TEST_NAME}.yml" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
         done
     - name: Publish Artifact to ECR
+      shell: bash
       run: |
         docker push "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}"
