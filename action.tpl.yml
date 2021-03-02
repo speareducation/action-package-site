@@ -32,7 +32,7 @@ runs:
         pwd
         DOCKERFILE_CONTENTS="%%BASE64_DOCKERFILE_CONTENTS%%"
         echo ${DOCKERFILE_CONTENTS} | base64 -d > ./Dockerfile
-
+        set
         docker build \
           --build-arg AWS_ACCESS_KEY_ID="${INPUT_AWS_ACCESS_KEY_ID}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${INPUT_AWS_SECRET_ACCESS_KEY}" \
