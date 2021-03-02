@@ -27,6 +27,7 @@ runs:
     - name: Test Release Artifact
       shell: bash
       run: |
+        set -ex
         DOCKER_IMAGE_TAG="${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}"
         TEST_CONFIG_FILE=./test.config.yml
         TEST_NAMES=$(yq -r '.tests | keys[]' < "${TEST_CONFIG_FILE}")
@@ -51,4 +52,5 @@ runs:
     - name: Publish Artifact to ECR
       shell: bash
       run: |
+        set -ex
         docker push "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}"
