@@ -2,6 +2,16 @@
 name: "Package Spear Site"
 author: "Kenzi Stewart <kstewart@speareducation.com>"
 description: "Packages a site into a deployable docker image"
+inputs:
+  aws-access-key-id:
+    required: true
+    description: "Amazon AWS Access Key ID"
+  aws-secret-access-key:
+    required: true
+    description: "Amazon AWS Secret Access Key"
+  node-auth-token:
+    require: true
+    description: "Authorization key for Node repository"
 runs:
   using: "composite"
   steps:
@@ -18,14 +28,14 @@ runs:
         echo ${DOCKERFILE_CONTENTS} | base64 -d > ./Dockerfile
 
         docker build \
-          --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-          --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+          --build-arg AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
+          --build-arg AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}" \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
           --build-arg GIT_REPOSITORY="${{ env.GITHUB_REPOSITORY }}" \
           --build-arg ARTIFACT="${ARTIFACT}" \
           --build-arg DOCKER_REGISTRY="${DOCKER_REGISTRY}" \
           --build-arg DOCKER_BASE_IMAGE="${DOCKER_REGISTRY}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
-          --build-arg NODE_AUTH_TOKEN="${{ secrets.NODE_AUTH_TOKEN }}" \
+          --build-arg NODE_AUTH_TOKEN="${{ inputs.node-auth-token }}" \
           --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
           -t "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}" .
     - name: Test Release Artifact
