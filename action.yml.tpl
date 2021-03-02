@@ -12,6 +12,9 @@ inputs:
   node-auth-token:
     require: true
     description: "Authorization key for Node repository"
+  github-ref:
+    require: true
+    description: "Github ref to use in tagging resulting image"
 runs:
   using: "composite"
   steps:
@@ -22,7 +25,7 @@ runs:
         set -a
         . .buildconfig
         set +a
-        TARGET_IMAGE_VERSION=$(echo "${{ env.GITHUB_REF }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        TARGET_IMAGE_VERSION=$(echo "${{ inputs.github-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         pwd
         DOCKERFILE_CONTENTS="%%BASE64_DOCKERFILE_CONTENTS%%"
         echo ${DOCKERFILE_CONTENTS} | base64 -d > ./Dockerfile
