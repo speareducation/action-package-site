@@ -44,7 +44,7 @@ runs:
           --build-arg ARTIFACT="${{ inputs.artifact }}" \
           --build-arg DOCKER_REGISTRY="${DOCKER_REGISTRY}" \
           --build-arg DOCKER_BASE_IMAGE="${DOCKER_REGISTRY}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
-          --build-arg NODE_AUTH_TOKEN="${{ inputs.NODE_AUTH_TOKEN}}" \
+          --build-arg NODE_AUTH_TOKEN="${{ inputs.node-auth-token }}" \
           -t "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}" .
     - name: Test Release Artifact
       shell: bash
