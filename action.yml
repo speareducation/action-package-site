@@ -48,7 +48,7 @@ runs:
           BUILD_ARG_AWS_TOKEN="--build-arg AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}"
         fi
         export AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}"
-        export AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-access-key }}"
+        export AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}"
         export AWS_REGION="${{ inputs.aws-region }}"
         if [[ -n "${{ inputs.aws-session-token }}" ]]; then
           export AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
