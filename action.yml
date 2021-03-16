@@ -93,8 +93,10 @@ runs:
             VAR_VALUE=$(yq -r ".tests.${TEST_NAME}.environment.${VAR_NAME}" < "${TEST_CONFIG_FILE}")
             DOCKER_ARGS+=" -e ${VAR_NAME}=${VAR_VALUE}"
           done
-          yq -Y ".tests.${TEST_NAME}.goss_config" < "${TEST_CONFIG_FILE}" > "${BUILD_DIR}/test-goss.${TEST_NAME}.yml"
-          GOSS_FILES_STRATEGY=cp GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${BUILD_DIR}/test-goss.${TEST_NAME}.yml" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
+          TEST_OUTPUT_FILE="test-goss.${TEST_NAME}.yaml"
+          yq -Y ".tests.${TEST_NAME}.goss_config" < "${TEST_CONFIG_FILE}" > "${TEST_OUTPUT_FILE}"
+
+          GOSS_FILES_STRATEGY=cp GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${TEST_OUTPUT_FILE}" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
         done
     - name: Publish Artifact to ECR
       shell: bash
