@@ -10,7 +10,7 @@ ARG NODE_AUTH_TOKEN
 
 RUN set -xe && \
     mkdir -p /root/.ssh && \
-    apk add gettext && \
+    apk add gettext yq && \
     export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
 
