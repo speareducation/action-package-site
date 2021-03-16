@@ -28,6 +28,10 @@ inputs:
   node-auth-token:
     description: Auth token for node packages
     required: true
+outputs:
+  ecr-image:
+    description: "Name of ECR image that was created during build"
+
 runs:
   using: "composite"
   steps:
@@ -98,9 +102,4 @@ runs:
 
           GOSS_FILES_STRATEGY=cp GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${TEST_OUTPUT_FILE}" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
         done
-    - name: Publish Artifact to ECR
-      shell: bash
-      run: |
-        set -ex
-        TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
-        docker push "${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
+        echo "::set-output name=ecr-image::$(echo ${DOCKER_IMAGE_TAG})"
