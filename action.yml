@@ -94,7 +94,7 @@ runs:
             DOCKER_ARGS+=" -e ${VAR_NAME}=${VAR_VALUE}"
           done
           yq -Y ".tests.${TEST_NAME}.goss_config" < "${TEST_CONFIG_FILE}" > "${BUILD_DIR}/test-goss.${TEST_NAME}.yml"
-          GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${BUILD_DIR}/test-goss.${TEST_NAME}.yml" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
+          GOSS_FILES_STRATEGY=cp GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${BUILD_DIR}/test-goss.${TEST_NAME}.yml" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
         done
     - name: Publish Artifact to ECR
       shell: bash
