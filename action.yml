@@ -45,7 +45,9 @@ runs:
         fi
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         pwd
-        find /actions -print
+        pushd /actions
+        git clone git@github.com:speareducation/action-package-site.git speareducation-action-package-site@main
+        popd
         docker build -f /actions/speareducation-action-package-site@main/Dockerfile \
           --build-arg AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}" \
