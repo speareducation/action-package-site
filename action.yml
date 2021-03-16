@@ -80,9 +80,8 @@ runs:
 
         TEST_NAMES=$(yq -r '.tests | keys[]' < "${TEST_CONFIG_FILE}")
         DGOSS_BIN="${BUILD_DIR}/dgoss"
-        mkdir -p ${BUILD_DIR}/goss
-        mkdir -p ${BUILD_DIR}/bin/
-        wget -q -O"${BUILD_DIR}/bin/goss" https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-linux-amd64 && chmod a+x "${BUILD_DIR}/bin/goss"
+        mkdir -p ${BASE_DIR}/goss
+        wget -q -O"${BASE_DIR}/goss/goss" https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-linux-amd64 && chmod a+x "${BUILD_DIR}/goss/goss"
         wget -q -O"${BUILD_DIR}/dgoss" "https://raw.githubusercontent.com/aelsabbahy/goss/v0.3.16/extras/dgoss/dgoss" && chmod a+x "${BUILD_DIR}/dgoss"
         for TEST_NAME in ${TEST_NAMES}; do
           DOCKER_ARGS=""
