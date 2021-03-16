@@ -38,6 +38,10 @@ runs:
         set -a
         . .buildconfig
         set +a
+        # load ecr helper
+        apt install -y amazon-ecr-credential-helper
+        mkdir -p "${HOME}/.docker"
+        echo "{ \"credsStore\": \"ecr-login\" }" >> ${HOME}/.docker/config.json
         AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
         BUILD_ARG_AWS_TOKEN=
         if [[ -n ${AWS_SESSION_TOKEN} ]]; then
