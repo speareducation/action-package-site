@@ -47,6 +47,12 @@ runs:
         if [[ -n ${AWS_SESSION_TOKEN} ]]; then
           BUILD_ARG_AWS_TOKEN="--build-arg AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}"
         fi
+        export AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}"
+        export AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-access-key }}"
+        export AWS_REGION="${{ inputs.aws-region }}"
+        if [[ -n "${{ inputs.aws-session-token }}" ]]; then
+          export AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
+        fi
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         docker build -f /actions/speareducation-action-package-site@main/Dockerfile \
           --build-arg AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
