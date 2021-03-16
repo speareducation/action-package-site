@@ -2,6 +2,32 @@
 name: "Package Spear Site"
 author: "Kenzi Stewart <kstewart@speareducation.com>"
 description: "Packages a site into a deployable docker image"
+inputs:
+  aws-access-key-id:
+    description: Amazon Access Key with permission to modify the ECR repository
+    required: true
+  aws-secret-access-key:
+    description: Amazon Secret Access Key
+    required: true
+  aws-session-token:
+    description: AWS Session token (if applicable)
+    required: false
+  aws-region:
+    description: Region of AWS ECR repository
+    required: false
+    default: us-east-1
+  ecr-registry:
+    description: 12-digit ID of ECR registry
+    required: true
+  ecr-repo:
+    description: Name of ECR repository to act upon
+    required: true
+  git-ref:
+    description: Git Ref to build
+    required: true
+  node-auth-token:
+    description: Auth token for node packages
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -12,22 +38,29 @@ runs:
         set -a
         . .buildconfig
         set +a
-        TARGET_IMAGE_VERSION=$(echo "${{ env.GITHUB_REF }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
+        BUILD_ARG_AWS_TOKEN=
+        if [[ -n ${AWS_SESSION_TOKEN} ]]; then
+          BUILD_ARG_AWS_TOKEN="--build-arg AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}"
+        fi
+        TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         docker build -f /github/actions/action-package-site/Dockerfile \
-          --build-arg AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-          --build-arg AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+          --build-arg AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
+          --build-arg AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}" \
+          ${BUILD_ARG_AWS_TOKEN} \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
           --build-arg GIT_REPOSITORY="${{ env.GITHUB_REPOSITORY }}" \
-          --build-arg ARTIFACT="${ARTIFACT}" \
-          --build-arg DOCKER_REGISTRY="${DOCKER_REGISTRY}" \
-          --build-arg DOCKER_BASE_IMAGE="${DOCKER_REGISTRY}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
-          --build-arg NODE_AUTH_TOKEN="${{ secrets.NODE_AUTH_TOKEN }}" \
-          --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} \
-          -t "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}" .
+          --build-arg ARTIFACT="${{ inputs.ecr-repo }}" \
+          --build-arg DOCKER_REGISTRY="${{ inputs.ecr-registry }}" \
+          --build-arg DOCKER_BASE_IMAGE="${{ inputs.ecr-registry }}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
+          --build-arg NODE_AUTH_TOKEN="${{ inputs.node-auth-token }}" \
+          -t "${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}" .
     - name: Test Release Artifact
       shell: bash
       run: |
-        DOCKER_IMAGE_TAG="${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}"
+        set -ex
+        TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        DOCKER_IMAGE_TAG="${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
         TEST_CONFIG_FILE=./test.config.yml
         TEST_NAMES=$(yq -r '.tests | keys[]' < "${TEST_CONFIG_FILE}")
         DGOSS_BIN="./build/dgoss"
@@ -51,4 +84,6 @@ runs:
     - name: Publish Artifact to ECR
       shell: bash
       run: |
-        docker push "${DOCKER_REGISTRY}/${ARTIFACT}:${TARGET_IMAGE_VERSION}"
+        set -ex
+        TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        docker push "${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
