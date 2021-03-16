@@ -78,8 +78,8 @@ runs:
         BUILD_DIR=$(pwd)
         DGOSS_BIN="./build/dgoss"
         mkdir -p build/goss
-        wget -q -O"${BUILD_DIR}/goss-linux-amd64" https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-linux-amd64
-        wget -q -O"${BUILD_DIR}/dgoss" "https://raw.githubusercontent.com/aelsabbahy/goss/v0.3.16/extras/dgoss/dgoss"
+        wget -q -O"${BUILD_DIR}/goss-linux-amd64" https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-linux-amd64 && chmod a+x "${BUILD_DIR}/goss-linux-amd64"
+        wget -q -O"${BUILD_DIR}/dgoss" "https://raw.githubusercontent.com/aelsabbahy/goss/v0.3.16/extras/dgoss/dgoss" && chmod a+x "${BUILD_DIR}/dgoss"
         for TEST_NAME in ${TEST_NAMES}; do
           DOCKER_ARGS=""
           echo "TEST: ${TEST_NAME}"
