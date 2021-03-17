@@ -42,8 +42,8 @@ RUN set -xe && \
     chmod -R go-rwx /root/.ssh && \
     export COMPOSER_API_KEY=$(/usr/bin/aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id=github/speareducation/core | jq -r '.SecretString' | jq -r '.COMPOSER_API_KEY') && \
     mkdir -p ~/.composer; touch ~/.composer/config.json && \
-    echo "{\"repositories\":[{\"type\":\"composer\",\"url\":\"https://packages.speareducation.com/composer\",\"options\":{\"http\":{\"header\":[\"x-api-key: ${COMPOSER_API_KEY}\"]}}}]}" > ~/.composer/config.json
-
+    echo "{\"repositories\":[{\"type\":\"composer\",\"url\":\"https://packages.speareducation.com/composer\",\"options\":{\"http\":{\"header\":[\"x-api-key: ${COMPOSER_API_KEY}\"]}}}]}" > ~/.composer/config.json && \
+    composer config --global --auth github-oauth.github.com "${GITHUB_TOKEN}"
 RUN set -xe && \
     echo "Removing stale /var/www/html dir if it exists" && \
     cd /var/www && \
