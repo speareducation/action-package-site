@@ -43,6 +43,7 @@ runs:
         . .buildconfig
         set +a
         # load ecr helper
+        sudo pip3 install dockerpty
         sudo apt update && sudo apt install -y amazon-ecr-credential-helper
         mkdir -p "${HOME}/.docker"
         echo "{ \"credsStore\": \"ecr-login\" }" >> ${HOME}/.docker/config.json
@@ -73,6 +74,7 @@ runs:
         set -ex
         sudo apt install -y python3-pip
         sudo pip3 install yq
+
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         DOCKER_IMAGE_TAG="${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
         TEST_CONFIG_FILE=${{ github.action_path }}/test.config.yml
