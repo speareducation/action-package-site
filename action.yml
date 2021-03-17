@@ -38,7 +38,6 @@ runs:
     - name: Package site
       shell: bash
       run: |
-        [[ ! -e /actions ]] && sudo ln -sfn /github/actions /actions
         set -ex
         set -a
         . .buildconfig
@@ -59,7 +58,7 @@ runs:
           export AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
         fi
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
-        docker build -f /actions/speareducation-action-package-site@main/Dockerfile \
+        docker build -f ${{ github.action_path }}/Dockerfile \
           --build-arg AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}" \
           ${BUILD_ARG_AWS_TOKEN} \
@@ -75,11 +74,10 @@ runs:
       run: |
         set -ex
         sudo apt install -y python3-pip
-        [[ ! -e /actions ]] && sudo ln -sfn /github/actions /actions
         sudo pip3 install yq
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         DOCKER_IMAGE_TAG="${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
-        TEST_CONFIG_FILE=/actions/speareducation-action-package-site@main/test.config.yml
+        TEST_CONFIG_FILE=${{ github.action_path }}/test.config.yml
         BASE_DIR=$(pwd)
         BUILD_DIR=${BASE_DIR}/build
         mkdir -p ${BUILD_DIR}
