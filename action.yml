@@ -43,7 +43,6 @@ runs:
         . .buildconfig
         set +a
         # load ecr helper
-        sudo pip3 install dockerpty
         sudo apt update && sudo apt install -y amazon-ecr-credential-helper
         mkdir -p "${HOME}/.docker"
         echo "{ \"credsStore\": \"ecr-login\" }" >> ${HOME}/.docker/config.json
