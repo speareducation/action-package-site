@@ -28,6 +28,9 @@ inputs:
   node-auth-token:
     description: Auth token for node packages
     required: true
+  github-access-token:
+    description: Personal access token for git checkouts
+    required: true
 outputs:
   ecr-image:
     description: "Name of ECR image that was created during build"
@@ -63,6 +66,7 @@ runs:
           ${BUILD_ARG_AWS_TOKEN} \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
           --build-arg GIT_REPOSITORY="${GITHUB_REPOSITORY}" \
+          --build-arg GITHUB_TOKEN="${{ inputs.github-access-token }}" \n
           --build-arg ARTIFACT="${{ inputs.ecr-repo }}" \
           --build-arg DOCKER_REGISTRY="${{ inputs.ecr-registry }}" \
           --build-arg DOCKER_BASE_IMAGE="${{ inputs.ecr-registry }}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \
