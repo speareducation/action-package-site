@@ -31,7 +31,7 @@ inputs:
 outputs:
   ecr-image:
     description: "Name of ECR image that was created during build"
-
+    value: string
 runs:
   using: "composite"
   steps:
@@ -46,20 +46,14 @@ runs:
         sudo apt update && sudo apt install -y amazon-ecr-credential-helper
         mkdir -p "${HOME}/.docker"
         echo "{ \"credsStore\": \"ecr-login\" }" >> ${HOME}/.docker/config.json
-        AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
         BUILD_ARG_AWS_TOKEN=
-        if [[ "x" == "x${AWS_SESSION_TOKEN}" ]]; then
+        if [[ "x" != "x${{ inputs.aws-session-token }}" ]]; then
+          export AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
           BUILD_ARG_AWS_TOKEN="--build-arg AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}"
         fi
         export AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}"
         export AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}"
         export AWS_REGION="${{ inputs.aws-region }}"
-        if [[ "x" != "x${{ inputs.aws-session-token }}" ]]; then
-          export AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
-        else
-          echo "AWS_SESSION_TOKEN is empty. Unsetting for auth to proceed."
-          unset AWS_SESSION_TOKEN
-        fi
 
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         set
