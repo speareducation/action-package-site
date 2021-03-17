@@ -48,7 +48,7 @@ runs:
         echo "{ \"credsStore\": \"ecr-login\" }" >> ${HOME}/.docker/config.json
         AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
         BUILD_ARG_AWS_TOKEN=
-        if [[ -n ${AWS_SESSION_TOKEN} ]]; then
+        if [[ "x" == "x${AWS_SESSION_TOKEN}" ]]; then
           BUILD_ARG_AWS_TOKEN="--build-arg AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}"
         fi
         export AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}"
