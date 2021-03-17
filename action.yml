@@ -38,6 +38,7 @@ runs:
     - name: Package site
       shell: bash
       run: |
+        [[ ! -e /actions ]] && sudo ln -sfn /github/actions /actions
         set -ex
         set -a
         . .buildconfig
@@ -74,6 +75,7 @@ runs:
       run: |
         set -ex
         sudo apt install -y python3-pip
+        [[ ! -e /actions ]] && sudo ln -sfn /github/actions /actions
         sudo pip3 install yq
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         DOCKER_IMAGE_TAG="${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
