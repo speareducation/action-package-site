@@ -56,7 +56,11 @@ runs:
         export AWS_REGION="${{ inputs.aws-region }}"
         if [[ "x" != "x${{ inputs.aws-session-token }}" ]]; then
           export AWS_SESSION_TOKEN="${{ inputs.aws-session-token }}"
+        else
+          echo "AWS_SESSION_TOKEN is empty. Unsetting for auth to proceed."
+          unset AWS_SESSION_TOKEN
         fi
+
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
         set
         docker build -f ${{ github.action_path }}/Dockerfile \
