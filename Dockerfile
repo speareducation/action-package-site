@@ -78,7 +78,7 @@ RUN set -xe && \
     fi
 
 RUN set -xe && \
-    echo "Running 'make install'..."
+    echo "Running 'make install'..." && \
     cd /var/www/html && \
     make install && \
     echo " done."
