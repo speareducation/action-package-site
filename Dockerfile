@@ -49,13 +49,6 @@ RUN set -xe && \
 COPY . /var/www/html
 
 RUN set -xe && \
-    echo "Configuring composer for access to private github packages..." && \
-    cd /var/www/html && \
-    cp composer.json composer.json.orig && \
-    export COMPOSER_API_KEY=$(/usr/bin/aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id=github/speareducation/core | jq -r '.SecretString' | jq -r '.COMPOSER_API_KEY') && \
-    cat composer.json.orig | jq -r '. + { "repositories": { "type": "composer", "url": "https://packages.speareducation.com/composer", "options": { "http": { "header": [ "x-api-key: foo" ] } } } }' > composer.json
-
-RUN set -xe && \
     echo "Loading build configuration from .buildconfig" && \
     [[ -f ./.buildconfig ]] && . ./.buildconfig && \
     if [[ -f /var/www/html/.env.drone ]]; then \
