@@ -56,6 +56,7 @@ runs:
         export AWS_REGION="${{ inputs.aws-region }}"
 
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        TARGET_IMAGE_VERSION=${TARGET_IMAGE_VERSION:-dev}
         docker build -f "${{ github.action_path }}/Dockerfile" \
           --build-arg AWS_ACCESS_KEY_ID="${{ inputs.aws-access-key-id }}" \
           --build-arg AWS_SECRET_ACCESS_KEY="${{ inputs.aws-secret-access-key }}" \
