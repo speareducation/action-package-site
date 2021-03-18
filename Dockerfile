@@ -38,10 +38,7 @@ RUN set -xe && \
       echo "Host github.com"; \
       echo "  IdentityFile /root/.ssh/id_rsa"; \
     } >> /root/.ssh/config && \
-    chmod -R go-rwx /root/.ssh && \
-    export COMPOSER_API_KEY=$(/usr/bin/aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id=github/speareducation/core | jq -r '.SecretString' | jq -r '.COMPOSER_API_KEY') && \
-    cp composer.json composer.json.orig && \
-    cat composer.json.orig | jq -r '. + { "repositories": { "type": "composer", "url": "https://packages.speareducation.com/composer", "options": { "http": { "header": [ "x-api-key: foo" ] } } } }' > composer.json
+    chmod -R go-rwx /root/.ssh
 
 RUN set -xe && \
     echo "Removing stale /var/www/html dir if it exists" && \
@@ -50,6 +47,13 @@ RUN set -xe && \
     mkdir -p /var/www/html
 
 COPY . /var/www/html
+
+RUN set -xe && \
+    echo "Configuring composer for access to private github packages..." && \
+    cd /var/www/html && \
+    cp composer.json composer.json.orig && \
+    export COMPOSER_API_KEY=$(/usr/bin/aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id=github/speareducation/core | jq -r '.SecretString' | jq -r '.COMPOSER_API_KEY') && \
+    cat composer.json.orig | jq -r '. + { "repositories": { "type": "composer", "url": "https://packages.speareducation.com/composer", "options": { "http": { "header": [ "x-api-key: foo" ] } } } }' > composer.json
 
 RUN set -xe && \
     echo "Loading build configuration from .buildconfig" && \
@@ -74,8 +78,10 @@ RUN set -xe && \
     fi
 
 RUN set -xe && \
+    echo "Running 'make install'..."
     cd /var/www/html && \
-    make install
+    make install && \
+    echo " done."
 
 RUN set -xe && \
     echo "Cleaning up unnecessary artifacts after build" && \
@@ -112,6 +118,7 @@ RUN set -xe && \
     echo " done."
 
 RUN set -xe && \
+    echo "Configuring application specific php overrides..."
     export PHP_INI_DIR=/etc/php7 && \
     export PHP_CONF_DIR=${PHP_INI_DIR}/conf.d && \
     mkdir -p "${PHP_CONF_DIR}" && \
