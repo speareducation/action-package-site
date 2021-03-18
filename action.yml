@@ -76,6 +76,7 @@ runs:
         sudo pip3 install yq
 
         TARGET_IMAGE_VERSION=$(echo "${{ inputs.git-ref }}" | sed -e 's%refs/tags/%%g' -e "s%^v%%g" -e "s%refs/heads/%%g" -e "s%features/%%g" -e "s%releases/%%g" -e "s%/%-%g")
+        TARGET_IMAGE_VERSION=${TARGET_IMAGE_VERSION:-dev}
         DOCKER_IMAGE_TAG="${{ inputs.ecr-registry }}/${{ inputs.ecr-repo }}:${TARGET_IMAGE_VERSION}"
         TEST_CONFIG_FILE=${{ github.action_path }}/test.config.yml
         BASE_DIR=$(pwd)
