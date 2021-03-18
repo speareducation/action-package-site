@@ -2,43 +2,12 @@ ARG DOCKER_BASE_IMAGE
 
 FROM ${DOCKER_BASE_IMAGE}
 
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_SESSION_TOKEN
 ARG NODE_AUTH_TOKEN
 
 RUN set -xe && \
     mkdir -p /root/.ssh && \
-    apk add gettext && \
-    export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' && \
-    ssh-keyscan github.com >> /root/.ssh/known_hosts
-
-RUN set -xe && \
-    export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID && \
-    export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY && \
-    export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN && \
-    echo "Requesting ssh keys for github from AWS Secretsmanager." && \
-    if [[ "x${AWS_SESSION_TOKEN}" == "x" ]]; then unset AWS_SESSION_TOKEN; fi; \
-    mkdir -p /root/.ssh && \
-    echo "Requesting ssh keys for github from AWS Secretsmanager." && \
-    aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id "drone/github_ssh_key" | \
-        jq -r '.SecretString | fromjson.github_ssh_key' | base64 -d > /root/.ssh/id_rsa && \
-    aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id "drone_bitbucket" | \
-        jq -r '.SecretString | fromjson.bitbucket_rsa' | base64 -d > /root/.ssh/id_rsa_bitbucket && \
-    cat /root/.ssh/id_rsa_bitbucket && \
-    chmod -R go-rwx /root/.ssh && \
-    export GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' && \
-    ssh-keyscan github.com >> /root/.ssh/known_hosts && \
-    ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts && \
-    aws --region=us-east-1 secretsmanager get-secret-value --secret-id "drone/github_ssh_key" | \
-        jq -r '.SecretString | fromjson.github_ssh_key' | base64 -d > /root/.ssh/id_rsa && \
-    { \
-      echo "Host bitbucket.org"; \
-      echo "  IdentityFile /root/.ssh/id_rsa_bitbucket"; \
-      echo "Host github.com"; \
-      echo "  IdentityFile /root/.ssh/id_rsa"; \
-    } >> /root/.ssh/config && \
-    chmod -R go-rwx /root/.ssh
+    apk add gettext
 
 RUN set -xe && \
     echo "Removing stale /var/www/html dir if it exists" && \
