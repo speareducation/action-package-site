@@ -118,7 +118,7 @@ RUN set -xe && \
     echo " done."
 
 RUN set -xe && \
-    echo "Configuring application specific php overrides..."
+    echo "Configuring application specific php overrides..." && \
     export PHP_INI_DIR=/etc/php7 && \
     export PHP_CONF_DIR=${PHP_INI_DIR}/conf.d && \
     mkdir -p "${PHP_CONF_DIR}" && \
