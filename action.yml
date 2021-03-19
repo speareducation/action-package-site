@@ -61,6 +61,10 @@ runs:
         mkdir -p "${HOME}/.docker"
         echo "{ \"credsStore\": \"ecr-login\" }" >> ${HOME}/.docker/config.json
 
+        # copy files from action to document root (docker build will move them into place)
+        cp "${{ github.action_path }}/04-secrets.sh" .
+        cp "${{ github.action_path }}/convert-secret-json-to-env.php" .
+
         docker build -f "${{ github.action_path }}/Dockerfile" \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
           --build-arg GIT_REPOSITORY="${GITHUB_REPOSITORY}" \
