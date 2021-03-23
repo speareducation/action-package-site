@@ -39,7 +39,7 @@ RUN set -xe && \
     mv /var/www/html/convert-secret-json-to-env.php /opt && \
     mv /var/www/html/04-secrets.sh /docker-entrypoint.d && \
     mv /var/www/html/docker-healthcheck.sh / && \
-    chmod a+x /docker-healthcheck.sh
+    chmod a+x /docker-healthcheck.sh && \
     chmod a+x /docker-entrypoint.d/04-secrets.sh
 
 RUN set -xe && \
