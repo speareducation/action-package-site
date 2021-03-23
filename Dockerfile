@@ -8,6 +8,19 @@ ARG GIT_REPOSITORY
 ARG GIT_BRANCH
 ARG GIT_COMMIT
 
+ENV AWS_ACCESS_KEY_ID "**string**"
+ENV AWS_SECRET_ACCESS_KEY "**string**"
+ENV APP_ENVIRONMENT ""
+ENV AWS_SESSION_TOKEN "**string**"
+
+WORKDIR /var/www/html
+
+LABEL spear.revision=true
+
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 CMD /docker-healthcheck.sh
+
 RUN set -xe && \
     mkdir -p /root/.ssh && \
     apk add gettext
@@ -25,6 +38,8 @@ RUN set -xe && \
     mkdir -p /docker-entrypoint.d && \
     mv /var/www/html/convert-secret-json-to-env.php /opt && \
     mv /var/www/html/04-secrets.sh /docker-entrypoint.d && \
+    mv /var/www/html/docker-healthcheck.sh / && \
+    chmod a+x /docker-healthcheck.sh
     chmod a+x /docker-entrypoint.d/04-secrets.sh
 
 RUN set -xe && \
@@ -110,3 +125,10 @@ RUN set -xe && \
     cp /var/www/html/app-supervisord.conf /etc/supervisord/conf.d; \
     fi; \
     echo "done."
+
+RUN set -xe && \
+    echo "Changing permissions on ssh and entrypoint scripts..." && \
+    chown -R root /root/.ssh && \
+    chmod -R go-rwx /root/.ssh && \
+    chmod -R a+x /docker-entrypoint.d && \
+    echo "Done with permissions changes."
