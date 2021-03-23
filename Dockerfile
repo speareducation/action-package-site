@@ -17,10 +17,6 @@ WORKDIR /var/www/html
 
 LABEL spear.revision=true
 
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
-
-HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 CMD /docker-healthcheck.sh
-
 RUN set -xe && \
     mkdir -p /root/.ssh && \
     apk add gettext
@@ -132,3 +128,6 @@ RUN set -xe && \
     chmod -R go-rwx /root/.ssh && \
     chmod -R a+x /docker-entrypoint.d && \
     echo "Done with permissions changes."
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 CMD /docker-healthcheck.sh
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
