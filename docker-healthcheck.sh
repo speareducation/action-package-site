@@ -24,6 +24,6 @@ case $APP_ENVIRONMENT in
 esac
 
 # shellcheck disable=SC2001
-SERVICE_NAME=$(echo "${ARTIFACT}" | sed -e "s%^.*/%%g")
+SERVICE_NAME=$(cat /etc/spear-repository | sed -e "s%^.*/%%g")
 wget -O/dev/null -q --header "Host: ${SERVICE_NAME}${DOMAIN}" http://localhost/healthcheck.html || exit 1
 exit 0

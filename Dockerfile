@@ -7,6 +7,7 @@ ARG NODE_AUTH_TOKEN
 ARG GIT_REPOSITORY
 ARG GIT_BRANCH
 ARG GIT_COMMIT
+ARG ARTIFACT
 
 ENV AWS_ACCESS_KEY_ID "**string**"
 ENV AWS_SECRET_ACCESS_KEY "**string**"
@@ -83,6 +84,7 @@ RUN set -xe && \
 RUN set -xe && \
     echo -n "Outputting Git information to container..." && \
     echo "${GIT_REPOSITORY}" | sed -e 's/accounts2/accounts/g' -e 's/curriculum/online/g' -e 's/\.git$//g' > /etc/spear-repository && \
+    echo "${ARTIFACT}" > /etc/spear-artifact && \
     echo "${GIT_BRANCH}" > /etc/spear-branch && \
     echo "${GIT_COMMIT}" > /etc/spear-commit-id && \
     date > /etc/spear-build-date && \
