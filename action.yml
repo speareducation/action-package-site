@@ -35,6 +35,13 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Fetch Scaffolding from github action
+      shell: bash
+      run: |
+        if [[ ! -d ${{ github.action_path }} ]]; then
+          ACTION_VERSION=$(echo "${{ github.action_path }}" | sed -e 's/.*@//g')
+          git clone https://github.com/speareducation/action-package-site -b ${ACTION_VERISON} ${{ github.action_path }}
+        fi
     - name: Package site
       shell: bash
       run: |
