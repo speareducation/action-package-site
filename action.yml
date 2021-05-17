@@ -77,6 +77,7 @@ runs:
         docker build -f "${{ github.action_path }}/Dockerfile" \
           --build-arg GIT_BRANCH="${TARGET_IMAGE_VERSION}" \
           --build-arg GIT_REPOSITORY="${GITHUB_REPOSITORY}" \
+          --build-arg SECRET_BASE_NAME="${SECRET_BASE_NAME}" \
           --build-arg ARTIFACT="${{ inputs.ecr-repo }}" \
           --build-arg DOCKER_REGISTRY="${{ inputs.ecr-registry }}" \
           --build-arg DOCKER_BASE_IMAGE="${{ inputs.ecr-registry }}/${DOCKER_BASE_IMAGE_NAME}:${DOCKER_BASE_IMAGE_VER}" \

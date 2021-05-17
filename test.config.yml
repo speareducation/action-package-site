@@ -1,16 +1,4 @@
 tests:
-  xdebug_enabled:
-    description: Verify that PHP_DEBUG=1 yields the xdebug module being enabled.
-    environment:
-      PHP_DEBUG: 1
-      APP_ENV: "development"
-    goss_config:
-      command:
-        php -m | grep xdebug:
-          exit-status: 0
-          stdout:
-            - "xdebug"
-          timeout: 10000
   xdebug_disabled:
     description: Verify that PHP_DEBUG=0 disables the xdebug module.
     environment:

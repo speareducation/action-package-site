@@ -20,18 +20,22 @@ fi
 
 REPO_NAME=${SECRET_NAME:-$(sed -e 's/\.git$//g' < /etc/spear-repository)}
 
-SECRET_NAME=${REPO_NAME}
-case "$REPO_NAME" in
-  speareducation/spear-zf1)
-    SECRET_NAME="speareducation/www"
-    ;;
-  speareducation/curriculum)
-    SECRET_NAME="speareducation/online"
-    ;;
-  *)
-    SECRET_NAME=$(cat /etc/spear-repository)
-    ;;
-esac
+if [[ -f /etc/secret-base-name ]]; then
+  SECRET_NAME=$(cat /etc/secret-base-name)
+else
+  SECRET_NAME=${REPO_NAME}
+  case "$REPO_NAME" in
+    speareducation/spear-zf1)
+      SECRET_NAME="speareducation/www"
+      ;;
+    speareducation/curriculum)
+      SECRET_NAME="speareducation/online"
+      ;;
+    *)
+      SECRET_NAME=$(cat /etc/spear-repository)
+      ;;
+  esac
+fi
 
 SECRET_TYPE="env"
 if [[ "x${SECRET_NAME}" == "xspeareducation/www" ]]; then

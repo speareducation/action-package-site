@@ -8,6 +8,7 @@ ARG GIT_REPOSITORY
 ARG GIT_BRANCH
 ARG GIT_COMMIT
 ARG ARTIFACT
+ARG SECRET_BASE_NAME
 
 ENV AWS_ACCESS_KEY_ID "**string**"
 ENV AWS_SECRET_ACCESS_KEY "**string**"
@@ -87,6 +88,7 @@ RUN set -xe && \
     echo "${ARTIFACT}" > /etc/spear-artifact && \
     echo "${GIT_BRANCH}" > /etc/spear-branch && \
     echo "${GIT_COMMIT}" > /etc/spear-commit-id && \
+    echo "${SECRET_BASE_NAME}" > /etc/secret-base-name && \
     date > /etc/spear-build-date && \
     mkdir -p /var/www/html/public && \
     echo "${GIT_BRANCH}" > /var/www/html/public/release.txt && \
