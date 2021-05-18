@@ -2,6 +2,8 @@ tests:
   node:
     default:
       description: Verify that node runs and returns a version
+      environment:
+        APP_ENV: "development"
       goss_config:
         command:
           node -v:
