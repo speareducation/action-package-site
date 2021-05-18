@@ -101,7 +101,20 @@ runs:
         sudo apt install -y python3-pip
         sudo pip3 install yq
 
-        TEST_NAMES=$(yq -r '.tests | keys[]' < "${TEST_CONFIG_FILE}")
+        set -a
+          . .buildconfig
+        set +a
+
+        case "${PROJECT_NAME}" in
+          node)
+            TEST_SUITE=node
+            ;;
+          *)
+            TEST_SUITE=php
+            ;;
+        esac
+
+        TEST_NAMES=$(yq -r '.tests | .'"${TEST_SUITE}"' | keys[]' < "${TEST_CONFIG_FILE}")
         DGOSS_BIN="${BUILD_DIR}/dgoss"
         mkdir -p ${BASE_DIR}/goss
         wget -q -O"${BASE_DIR}/goss/goss" https://github.com/aelsabbahy/goss/releases/download/v0.3.16/goss-linux-amd64 && chmod a+x "${BASE_DIR}/goss/goss"
@@ -112,14 +125,14 @@ runs:
           DOCKER_ARGS=""
           echo "TEST: ${TEST_NAME}"
           echo -n "  "
-          yq -r ".tests.${TEST_NAME}.description" < "${TEST_CONFIG_FILE}"
-          ENV_VARS=$(yq -r ".tests.${TEST_NAME}.environment | keys[]" < "${TEST_CONFIG_FILE}")
+          yq -r ".tests.${TEST_SUITE}.${TEST_NAME}.description" < "${TEST_CONFIG_FILE}"
+          ENV_VARS=$(yq -r ".tests.${TEST_SUITE}.${TEST_NAME}.environment | keys[]" < "${TEST_CONFIG_FILE}")
           for VAR_NAME in ${ENV_VARS}; do
-            VAR_VALUE=$(yq -r ".tests.${TEST_NAME}.environment.${VAR_NAME}" < "${TEST_CONFIG_FILE}")
+            VAR_VALUE=$(yq -r ".tests.${TEST_SUITE}.${TEST_NAME}.environment.${VAR_NAME}" < "${TEST_CONFIG_FILE}")
             DOCKER_ARGS+=" -e ${VAR_NAME}=${VAR_VALUE}"
           done
           TEST_OUTPUT_FILE="test-goss.${TEST_NAME}.yaml"
-          yq -Y ".tests.${TEST_NAME}.goss_config" < "${TEST_CONFIG_FILE}" > "${TEST_OUTPUT_FILE}"
+          yq -Y ".tests.${TEST_SUITE}.${TEST_NAME}.goss_config" < "${TEST_CONFIG_FILE}" > "${TEST_OUTPUT_FILE}"
 
           GOSS_FILES_STRATEGY=cp GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${TEST_OUTPUT_FILE}" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
         done
