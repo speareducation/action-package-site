@@ -33,8 +33,8 @@ COPY . /var/www/html
 
 RUN set -xe && \
     if [[ -d /var/www/html/runit ]]; then \
-        echo "Copying runit scripts to /etc/service"
-        cp -a /var/www/html/runit/* /etc/service \
+        echo "Copying runit scripts to /etc/service" && \
+        cp -a /var/www/html/runit/* /etc/service; \
     fi
 
 RUN set -xe && \
