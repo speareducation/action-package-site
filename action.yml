@@ -100,12 +100,9 @@ runs:
         # install dependencies so we can run tests
         sudo apt install -y python3-pip
         sudo pip3 install yq
+        [[ -f .buildconfig ]] && . .buildconfig
 
-        set -a
-          . .buildconfig
-        set +a
-
-        case "${PROJECT_NAME}" in
+        case "${PROJECT_TYPE}" in
           node)
             TEST_SUITE=node
             ;;
