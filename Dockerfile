@@ -32,6 +32,12 @@ RUN set -xe && \
 COPY . /var/www/html
 
 RUN set -xe && \
+    if [[ -d /var/www/html/runit ]]; then \
+        echo "Copying runit scripts to /etc/service"
+        cp -a /var/www/html/runit/* /etc/service \
+    fi
+
+RUN set -xe && \
     mkdir -p /opt && \
     mkdir -p /docker-entrypoint.d && \
     mv /var/www/html/convert-secret-json-to-env.php /opt && \
@@ -77,9 +83,12 @@ RUN set -xe && \
     echo " done."
 
 RUN set -xe && \
-    echo -n "Setting laravel log to point to /dev/stderr..." && \
-    mkdir -p /var/log/html/storage/logs && \
-    ln -sfn /dev/stderr /var/log/html/storage/logs/laravel.log && \
+    [[ -f ./.buildconfig ]] && . ./.buildconfig && \
+    if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
+        echo -n "Setting laravel log to point to /dev/stderr..." && \
+        mkdir -p /var/log/html/storage/logs && \
+        ln -sfn /dev/stderr /var/log/html/storage/logs/laravel.log; \
+    fi; \
     echo " done."
 
 RUN set -xe && \
@@ -105,24 +114,28 @@ RUN set -xe && \
     echo " done."
 
 RUN set -xe && \
-    echo "Configuring application specific php overrides..." && \
-    export PHP_INI_DIR=/etc/php7 && \
-    export PHP_CONF_DIR=${PHP_INI_DIR}/conf.d && \
-    mkdir -p "${PHP_CONF_DIR}" && \
-    echo "Configuring target container php limits..." && \
-    export DOCKER_PHP_UPLOAD_MAX_FILESIZE=${DOCKER_PHP_UPLOAD_MAX_FILESIZE:-128M} && \
-    echo "  Setting max upload size to ${DOCKER_PHP_UPLOAD_MAX_FILESIZE}" && \
-    echo "upload_max_filesize = ${DOCKER_PHP_UPLOAD_MAX_FILESIZE}" >> "${PHP_CONF_DIR}/99-limits.ini" && \
-    export DOCKER_PHP_POST_MAX_SIZE=${DOCKER_PHP_POST_MAX_SIZE:-128M} && \
-    echo "  Setting max post size to ${DOCKER_PHP_POST_MAX_SIZE}" && \
-    echo "post_max_size = ${DOCKER_PHP_POST_MAX_SIZE}" >> "${PHP_CONF_DIR}/99-limits.ini" && \
-    export DOCKER_PHP_MEMORY_LIMIT=${DOCKER_PHP_MEMORY_LIMIT:-128M} && \
-    echo "  Setting memory limit to ${DOCKER_PHP_MEMORY_LIMIT}" && \
-    echo "memory_limit = ${DOCKER_PHP_MEMORY_LIMIT}" >> "${PHP_CONF_DIR}/99-limits.ini" && \
+    [[ -f ./.buildconfig ]] && . ./.buildconfig && \
+    if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
+
+        echo "Configuring application specific php overrides..." && \
+        export PHP_INI_DIR=/etc/php7 && \
+        export PHP_CONF_DIR=${PHP_INI_DIR}/conf.d && \
+        mkdir -p "${PHP_CONF_DIR}" && \
+        echo "Configuring target container php limits..." && \
+        export DOCKER_PHP_UPLOAD_MAX_FILESIZE=${DOCKER_PHP_UPLOAD_MAX_FILESIZE:-128M} && \
+        echo "  Setting max upload size to ${DOCKER_PHP_UPLOAD_MAX_FILESIZE}" && \
+        echo "upload_max_filesize = ${DOCKER_PHP_UPLOAD_MAX_FILESIZE}" >> "${PHP_CONF_DIR}/99-limits.ini" && \
+        export DOCKER_PHP_POST_MAX_SIZE=${DOCKER_PHP_POST_MAX_SIZE:-128M} && \
+        echo "  Setting max post size to ${DOCKER_PHP_POST_MAX_SIZE}" && \
+        echo "post_max_size = ${DOCKER_PHP_POST_MAX_SIZE}" >> "${PHP_CONF_DIR}/99-limits.ini" && \
+        export DOCKER_PHP_MEMORY_LIMIT=${DOCKER_PHP_MEMORY_LIMIT:-128M} && \
+        echo "  Setting memory limit to ${DOCKER_PHP_MEMORY_LIMIT}" && \
+        echo "memory_limit = ${DOCKER_PHP_MEMORY_LIMIT}" >> "${PHP_CONF_DIR}/99-limits.ini"; \
+    fi; \
     if [[ -f "/var/www/html/app-supervisord.conf" ]]; then \
-    echo "  Detected supervisord app configuration. Installing conf file..."; \
-    mkdir -p /etc/supervisord/conf.d; \
-    cp /var/www/html/app-supervisord.conf /etc/supervisord/conf.d; \
+        echo "  Detected supervisord app configuration. Installing conf file..."; \
+        mkdir -p /etc/supervisord/conf.d; \
+        cp /var/www/html/app-supervisord.conf /etc/supervisord/conf.d; \
     fi; \
     echo "done."
 
