@@ -70,7 +70,7 @@ RUN set -xe && \
 
 RUN set -xe && \
     echo "Running 'make install'..." && \
-    $(which make) || apk add make
+    $(which make) || apk add make && \
     cd /var/www/html && \
     make install && \
     echo " done."
