@@ -79,8 +79,11 @@ RUN set -xe && \
     echo "Cleaning up unnecessary artifacts after build" && \
     rm -rf /var/www/html/node_modules && \
     rm -rf /var/www/html/.git && \
-    echo -n "Changing permissions on /var/www/html..." && \
-    chown -R www-data /var/www/html && \
+    [[ -f ./.buildconfig ]] && . ./.buildconfig && \
+    if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
+        echo -n "Changing permissions on /var/www/html..." && \
+        chown -R www-data /var/www/html; \
+    fi; \
     echo " done."
 
 RUN set -xe && \
