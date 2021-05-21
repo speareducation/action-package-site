@@ -4,6 +4,10 @@
 
 set -e
 
+AWS_BIN=$(which aws)
+
+AWS_BIN=${AWS_BIN:-/usr/bin/aws}
+
 if [[ "x${RELEASE_DEBUG}" == "x1" ]]; then
   set -x
 fi
@@ -71,35 +75,36 @@ if [[ -z "${APP_ENVIRONMENT}" ]]; then
 fi
 
 SECRET_ID=${APP_ENVIRONMENT}/${SECRET_NAME}/master/${SECRET_TYPE}
-SECRET_DATA=$(/usr/bin/aws --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id "${SECRET_ID}")
+SECRET_DATA=$(${AWS_BIN} --region="${AWS_REGION:-us-east-1}" secretsmanager get-secret-value --secret-id "${SECRET_ID}")
 [[ "x${SECRET_DATA}" == "x" ]] && exit 0;
-
-# create secrets file
-echo "Delegating to PHP to generate secrets file..."
 
 # shellcheck disable=SC2116
 SECRET_JSON=$(echo "${SECRET_DATA}")
+
+ENV_FILE_LOCATION=${ENV_FILE_LOCATION:-/var/www/html/.env}
 
 SECRET_TEMP_FILE=$(mktemp /tmp/secret-temp.XXXXXXX)
 SECRET_OUTPUT_LOCATION=
 case ${SECRET_TYPE} in
     env)
-        SECRET_OUTPUT_LOCATION=/var/www/html/.env
+        SECRET_OUTPUT_LOCATION=${ENV_FILE_LOCATION}
         ;;
     ini)
         SECRET_OUTPUT_LOCATION=/var/www/html/application.ini
         ;;
 esac
 
-CURRENT_BRANCH=${CURRENT_BRANCH:-master}
-
 echo "${SECRET_JSON}" >> "${SECRET_TEMP_FILE}"
 
-php /opt/convert-secret-json-to-env.php < "${SECRET_TEMP_FILE}" > "${SECRET_OUTPUT_LOCATION}"
+convert_secrets() {
+  SECRET_TEMP_FILE=${1}
+  jq -r .SecretString < "${SECRET_TEMP_FILE}" | jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]"
+}
+
+convert_secrets "${SECRET_TEMP_FILE}" > "${SECRET_OUTPUT_LOCATION}"
 rm -f "${SECRET_TEMP_FILE}"
 
-if [[ -f /var/www/html/.env ]]; then
-  echo "LOG_CHANNEL=stderr" >> /var/www/html/.env
+if [[ -f ${ENV_FILE_LOCATION} ]]; then
+  echo "LOG_CHANNEL=stderr" >> "${ENV_FILE_LOCATION}"
 fi
 
-echo "PHP secrets delegation complete."
