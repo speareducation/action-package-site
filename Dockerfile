@@ -75,16 +75,18 @@ RUN set -xe && \
     echo " done."
 
 RUN set -xe && \
-    echo "Cleaning up unnecessary artifacts after build" && \
-    if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
-        rm -rf /var/www/html/node_modules; \
-    fi; \
-    rm -rf /var/www/html/.git && \
+    echo "Cleaning up unnecessary artifacts after build..." && \
     [[ -f ./.buildconfig ]] && . ./.buildconfig && \
     if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
-        echo -n "Changing permissions on /var/www/html..." && \
-        chown -R www-data /var/www/html; \
+        echo -n "  Removing node_modules directory..." && \
+        rm -rf /var/www/html/node_modules && \
+        echo " done."; \
+        echo -n "  Changing permissions on /var/www/html..." && \
+        chown -R www-data /var/www/html && \
+        echo " done."; \
     fi; \
+    echo -n "  Removing .git directory..." && \
+    rm -rf /var/www/html/.git && \
     echo " done."
 
 RUN set -xe && \
