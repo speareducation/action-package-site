@@ -76,7 +76,9 @@ RUN set -xe && \
 
 RUN set -xe && \
     echo "Cleaning up unnecessary artifacts after build" && \
-    rm -rf /var/www/html/node_modules && \
+    if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
+        rm -rf /var/www/html/node_modules; \
+    fi; \
     rm -rf /var/www/html/.git && \
     [[ -f ./.buildconfig ]] && . ./.buildconfig && \
     if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
@@ -119,7 +121,6 @@ RUN set -xe && \
 RUN set -xe && \
     [[ -f ./.buildconfig ]] && . ./.buildconfig && \
     if [[ "x${PROJECT_TYPE}" != "xnode" ]]; then \
-
         echo "Configuring application specific php overrides..." && \
         export PHP_INI_DIR=/etc/php7 && \
         export PHP_CONF_DIR=${PHP_INI_DIR}/conf.d && \
