@@ -2,6 +2,7 @@
 
 set -e
 
+[[ -f /var/www/html/.buildconfig ]] && . /var/www/html/.buildconfig
 # shellcheck disable=SC2001
 DOCKER_HEALTHCHECK_PATH=${DOCKER_HEALTHCHECK_PATH:-/healthcheck.html}
 SERVICE_NAME=${DOCKER_HOSTNAME:-$(cat "/etc/spear-repository" | sed -e "s%^.*/%%g")}
