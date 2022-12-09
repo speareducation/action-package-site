@@ -132,4 +132,4 @@ runs:
 
           GOSS_FILES_STRATEGY=cp GOSS_PATH="${BASE_DIR}/goss/goss" GOSS_FILE="${TEST_OUTPUT_FILE}" ${DGOSS_BIN} run --rm -it ${DOCKER_ARGS} "${DOCKER_IMAGE_TAG}"
         done
-        echo "::set-output name=ecr-image::$(echo ${DOCKER_IMAGE_TAG})"
+        echo "ecr-image=$(echo ${DOCKER_IMAGE_TAG})" >> ${GITHUB_OUTPUT}
